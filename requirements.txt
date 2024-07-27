@@ -8,5 +8,4 @@ streamlit_folium
 folium
 docx
 python-docx  
-docx.oxml.ns
-docx.oxml
+
