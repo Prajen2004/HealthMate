@@ -11,6 +11,9 @@ from geopy.geocoders import Nominatim
 from streamlit_folium import st_folium
 import folium
 import random
+from docx import Document
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
 
 
 st.set_page_config(
@@ -24,6 +27,7 @@ st.set_page_config(
 #background_generator = BackgroundCSSGenerator(img1_path, img2_path)
 #page_bg_img = background_generator.generate_background_css()
 #st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 
 
@@ -267,7 +271,7 @@ training_data = {
     "painful urination": "You might have a urinary tract infection or other urinary issues. Increase fluid intake, use over-the-counter pain relief, and consult a healthcare professional if symptoms are severe or persistent."
 }
 # Simulated database of doctors
-# Simulated database of doctors
+
 doctor_names = [
     "Dr. Aparna", "Dr. Balamurugan", "Dr. Clinton", "Dr. Devika", "Dr. Elias",
     "Dr. Farhan", "Dr. Gitanjali", "Dr. Harish", "Dr. Isha", "Dr. Jayant",
@@ -358,7 +362,7 @@ def diagnose(symptoms):
         return training_data[symptom_lower]
     else:
         # Use the API if the symptom is not in the training data
-        messages = [SystemMessage("You are a virtual doctor that you want to predict the diesease name and give the remedies ."), HumanMessage(f"I have {symptoms}. What should I do?")]
+        messages = [SystemMessage("You are a virtual doctor that you predict the diesease name and give the remedies ."), HumanMessage(f"I have {symptoms}. What should I do?")]
         response = get_chat_completion(messages)
         return response
 
@@ -601,16 +605,27 @@ def main():
             if st.button("📖 Export Chat History"):
                 if st.session_state.messages:
                     try:
-                        with open("chat_history.txt", "w") as f:
-                            for message in st.session_state.messages:
-                                role, content = message['role'], message['content']
-                                f.write(f"{role.capitalize()}: {content}\n")
-                        st.success("Chat history exported to 'chat_history.txt'")
+                # Load the template
+                        template_path = "template.docx"  # Path to your template file
+                        doc = Document(template_path)
+                        doc.add_paragraph("CHAT HISTORY", style='Heading1')
+                
+                # Add content to the document
+                        #doc.add_page_break()  # Optional: add a page break before adding new content
+                        #doc.add_heading('Chat History', level=1)
+
+                        for message in st.session_state.messages:
+                            role, content = message['role'], message['content']
+                            doc.add_paragraph(f"{role.capitalize()}: {content}")
+
+                # Save the document with the exported chat history
+                        file_path = "chat_history_with_template.docx"
+                        doc.save(file_path)
+                        st.success(f"Chat history exported to '{file_path}'")
                     except Exception as e:
                         st.error(f"Error writing to file: {e}")
                 else:
                     st.write("No chat history to export.")
-
 
         with tabs[1]:
             st.header("Meet a Doctor for Further Consultation")
@@ -627,6 +642,7 @@ def main():
             if st.button("🔍 Check Nearby Doctors"):
                 if location:
                     st.session_state.map = create_map(selected_speciality, location)
+                    st.write()
                 else:
                     st.write("🚫 Please enter your location.")
 
