@@ -20,7 +20,7 @@ import io
 st.set_page_config(
     page_title="HealthMate",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
     theme={
         "primaryColor": "#1f77b4",  # Main color for primary elements (e.g., buttons)
         "backgroundColor": "#121212",  # Background color of the app
