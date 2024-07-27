@@ -562,11 +562,11 @@ def main():
             if st.button("📖 Export Chat History"):
                 if st.session_state.messages:
                     try:
-                        with open("chat_history.docx", "r+") as f:
+                        with open("chat_history.txt", "w") as f:
                             for message in st.session_state.messages:
                                 role, content = message['role'], message['content']
                                 f.write(f"{role.capitalize()}: {content}\n")
-                        st.success("Chat history exported to 'chat_history.docx'")
+                        st.success("Chat history exported to 'chat_history.txt'")
                     except Exception as e:
                         st.error(f"Error writing to file: {e}")
                 else:
