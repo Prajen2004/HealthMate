@@ -6,3 +6,4 @@ background
 geopy
 streamlit_folium
 folium
+docx
