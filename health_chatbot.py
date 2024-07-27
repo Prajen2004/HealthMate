@@ -14,12 +14,20 @@ import random
 from docx import Document
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+import io
 
 
 st.set_page_config(
     page_title="HealthMate",
     layout="wide",
     initial_sidebar_state="collapsed"
+    theme={
+        "primaryColor": "#1f77b4",  # Main color for primary elements (e.g., buttons)
+        "backgroundColor": "#121212",  # Background color of the app
+        "secondaryBackgroundColor": "#1e1e1e",  # Background color for sidebars and other secondary elements
+        "textColor": "#e0e0e0",  # Color of the text
+        "font": "sans serif"  # Font family (optional)
+    }
 )
 
 #img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\Assests\black-background.gif"
@@ -606,26 +614,32 @@ def main():
                 if st.session_state.messages:
                     try:
                 # Load the template
-                        template_path = "template.docx"  # Path to your template file
-                        doc = Document(template_path)
-                        doc.add_paragraph("CHAT HISTORY", style='Heading1')
-                
-                # Add content to the document
-                        #doc.add_page_break()  # Optional: add a page break before adding new content
-                        #doc.add_heading('Chat History', level=1)
+                        doc = Document("template.docx")
 
+                # Add chat history to the document
+                        doc.add_paragraph("Chat History", style='Heading1')
                         for message in st.session_state.messages:
                             role, content = message['role'], message['content']
                             doc.add_paragraph(f"{role.capitalize()}: {content}")
 
-                # Save the document with the exported chat history
-                        file_path = "chat_history_with_template.docx"
-                        doc.save(file_path)
-                        st.success(f"Chat history exported to '{file_path}'")
+                # Save the document to an in-memory file
+                        buffer = io.BytesIO()
+                        doc.save(buffer)
+                        buffer.seek(0)
+
+                # Provide download button
+                        st.download_button(
+                            label="Download Chat History",
+                            data=buffer,
+                            file_name="chat_history.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        )
+
+                        st.success("Chat history is ready for download.")
                     except Exception as e:
                         st.error(f"Error writing to file: {e}")
-                else:
-                    st.write("No chat history to export.")
+            else:
+                st.write("No chat history to export.")
 
         with tabs[1]:
             st.header("Meet a Doctor for Further Consultation")
