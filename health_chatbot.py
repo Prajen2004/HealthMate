@@ -7,6 +7,11 @@ from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 import threading
 import time
 from background import BackgroundCSSGenerator
+from geopy.geocoders import Nominatim
+from streamlit_folium import st_folium
+import folium
+import random
+
 
 st.set_page_config(
     page_title="HealthMate",
@@ -14,11 +19,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-#img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\black-background.gif"
-#img2_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\black-background.gif"
-#background_generator = BackgroundCSSGenerator(img1_path, img2_path)
-#page_bg_img = background_generator.generate_background_css()
-#st.markdown(page_bg_img, unsafe_allow_html=True)
+img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\Assests\black-background.gif"
+img2_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\Assests\black-background.gif"
+background_generator = BackgroundCSSGenerator(img1_path, img2_path)
+page_bg_img = background_generator.generate_background_css()
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 
 # Set the environment variable for the API key
@@ -260,7 +266,14 @@ training_data = {
     "persistent or severe headache": "You might be experiencing a migraine, tension headache, or other condition. Keep a headache diary, manage stress, and consult a healthcare professional if headaches are severe or frequent.",
     "painful urination": "You might have a urinary tract infection or other urinary issues. Increase fluid intake, use over-the-counter pain relief, and consult a healthcare professional if symptoms are severe or persistent."
 }
-
+# Simulated database of doctors
+# Simulated database of doctors
+doctor_names = [
+    "Dr. Aparna", "Dr. Balamurugan", "Dr. Clinton", "Dr. Devika", "Dr. Elias",
+    "Dr. Farhan", "Dr. Gitanjali", "Dr. Harish", "Dr. Isha", "Dr. Jayant",
+    "Dr. Kavita", "Dr. Lalit", "Dr. Manisha", "Dr. Nitin", "Dr. Ojas",
+    "Dr. Pranav", "Dr. Qadir", "Dr. Radhika", "Dr. Sameer", "Dr. Tanvi"
+]
 # Define health tips based on BMI categories
 def get_bmi_tips(bmi):
     if bmi < 18.5:
@@ -345,7 +358,7 @@ def diagnose(symptoms):
         return training_data[symptom_lower]
     else:
         # Use the API if the symptom is not in the training data
-        messages = [SystemMessage("You are a virtual doctor and you should deal all symptoms ."), HumanMessage(f"I have {symptoms}. What should I do?")]
+        messages = [SystemMessage("You are a virtual doctor that you predict the diesease name and provide the remedies ."), HumanMessage(f"I have {symptoms}. What should I do?")]
         response = get_chat_completion(messages)
         return response
 
@@ -501,6 +514,26 @@ Transform your healthcare experience with ease and convenience. Embrace a health
     )
 
     #st.sidebar.image(r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\assets\logo-no-background.png", use_column_width=False)
+def create_map(selected_speciality, location):
+    geolocator = Nominatim(user_agent="healthmate")
+    geocode_result = geolocator.geocode(location)
+
+    if geocode_result:
+        latitude, longitude = geocode_result.latitude, geocode_result.longitude
+
+        # Create a folium map
+        m = folium.Map(location=[latitude, longitude], zoom_start=13)
+
+        # Add markers for nearby doctors (simulated data)
+        folium.Marker([latitude, longitude], popup="Your Location", tooltip="Your Location").add_to(m)
+        folium.Marker([latitude + 0.01, longitude + 0.01], popup="Dr. Aparna", tooltip="Dr. Aparna").add_to(m)
+        folium.Marker([latitude + 0.02, longitude - 0.01], popup="Dr. Balamurugan", tooltip="Dr. Balamurugan").add_to(m)
+        folium.Marker([latitude - 0.01, longitude + 0.02], popup="Dr. Clinton", tooltip="Dr. Clinton").add_to(m)
+
+        return m
+    else:
+        st.write("🚫 Location not found. Please enter a valid location.")
+        return None
 
 
 
@@ -548,6 +581,8 @@ def main():
 
             if 'messages' not in st.session_state:
                 st.session_state.messages = []
+            if 'diagnosis' not in st.session_state:
+                st.session_state.diagnosis = ""
 
             symptoms = st.text_input("🔍 Enter your symptoms:")
 
@@ -556,9 +591,12 @@ def main():
                     diagnosis = diagnose(symptoms)
                     st.session_state.messages.append({"role": "user", "content": symptoms})
                     st.session_state.messages.append({"role": "assistant", "content": diagnosis})
-                    st.write(f"**Diagnosis:** {diagnosis}")
+                    st.session_state.diagnosis = diagnosis
                 else:
                     st.write("Please enter your symptoms.")
+            if st.session_state.diagnosis:
+                st.write(f"**Diagnosis:** {st.session_state.diagnosis}")
+
 
             if st.button("📖 Export Chat History"):
                 if st.session_state.messages:
@@ -573,12 +611,13 @@ def main():
                 else:
                     st.write("No chat history to export.")
 
+
         with tabs[1]:
             st.header("Meet a Doctor for Further Consultation")
             st.write("📅 **Schedule a meeting with a specialized doctor**")
 
     # Dropdown for selecting a specialty
-            specialities = ["Cardiologist", "Dermatologist", "Neurologist", "Pediatrician", "Psychiatrist", "General Physician"]
+            specialities = ["Cardiologist", "Dermatologist", "Neurologist", "Pediatrician", "Psychiatrist", "General Physician","Orthopaedic"]
             selected_speciality = st.selectbox("🔍 Select Speciality", specialities)
 
     # Input for location
@@ -587,25 +626,23 @@ def main():
     # Button to check nearby doctors
             if st.button("🔍 Check Nearby Doctors"):
                 if location:
-            # Placeholder response for demo purposes
-                    st.write(f"🔎 Checking for nearby {selected_speciality}s in {location}...")
-                    st.markdown(f"👨‍⚕️ Nearby Doctors: Dr. Aparna : {selected_speciality} , Dr. Balamurugan : {selected_speciality} , Dr. Clinton : {selected_speciality} ")
+                    st.session_state.map = create_map(selected_speciality, location)
                 else:
                     st.write("🚫 Please enter your location.")
 
+            if 'map' in st.session_state and st.session_state.map:
+                st_folium(st.session_state.map, width=700, height=500, use_container_width=True)
+
     # Request an appointment
-            #st.radio("Select the Doctor", ["Dr. Aparna", "Dr. Balamurugan", "Dr. Clinton"])
-            st.subheader("📅 Request an Appointment for the above mentioned doctors")
-            #st.sidebar.radio("Select the Doctor", ["Dr. Aparna", "Dr. Balamurugan", "Dr. Clinton"])
+            st.subheader("📅 Request an Appointment for the above-mentioned doctors")
             name = st.text_input("📝 Your Name")
             contact = st.text_input("📞 Contact Number")
             if st.button("📩 Submit Request"):
                 if name and contact:
-                    st.write("✅ Your appointment request has been submitted to all the doctors . They will get back to you soon.")
+                    st.write("✅ Your appointment request has been submitted to all the doctors. They will get back to you soon.")
             # Implement actual request submission logic here
-                else:
-                    st.write("🚫 Please fill in all required fields.")
-
+            else:
+                st.write("🚫 Please fill in all required fields.")
 
         with tabs[2]:
             st.header("⏰ Medication Reminder")
