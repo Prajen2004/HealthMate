@@ -20,14 +20,7 @@ import io
 st.set_page_config(
     page_title="HealthMate",
     layout="wide",
-    initial_sidebar_state="collapsed",
-    theme={
-        "primaryColor": "#1f77b4",  # Main color for primary elements (e.g., buttons)
-        "backgroundColor": "#121212",  # Background color of the app
-        "secondaryBackgroundColor": "#1e1e1e",  # Background color for sidebars and other secondary elements
-        "textColor": "#e0e0e0",  # Color of the text
-        "font": "sans serif"  # Font family (optional)
-    }
+    initial_sidebar_state="collapsed"
 )
 
 #img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\Assests\black-background.gif"
