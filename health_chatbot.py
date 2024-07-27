@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\assets\black-background.gif"
+img1_path = r"C:\Users\praje\OneDrive\AppData\Desktop\project\health\work\black-background.gif"
 background_generator = BackgroundCSSGenerator(img1_path)
 page_bg_img = background_generator.generate_background_css()
 st.markdown(page_bg_img, unsafe_allow_html=True)
