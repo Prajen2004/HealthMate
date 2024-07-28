@@ -558,6 +558,12 @@ def main():
     #sidebar()
 
     # Check authentication status
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
+    if 'diagnosis' not in st.session_state:
+        st.session_state.diagnosis = ""
+    if 'all_symptoms' not in st.session_state:
+        st.session_state.all_symptoms = ""
     if 'authenticated' not in st.session_state:
         st.session_state.authenticated = False
 
@@ -593,7 +599,9 @@ def main():
 
             if st.button("🏥 Get Diagnosis"):
                 if symptoms:
-                    diagnosis = diagnose(symptoms)
+                    st.session_state.all_symptoms += " " + symptoms
+                    combined_symptoms = st.session_state.all_symptoms.strip()
+                    diagnosis = diagnose(combined_symptoms)
                     st.session_state.messages.append({"role": "user", "content": symptoms})
                     st.session_state.messages.append({"role": "assistant", "content": diagnosis})
                     st.session_state.diagnosis = diagnosis
