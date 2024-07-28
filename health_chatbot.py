@@ -363,7 +363,7 @@ def diagnose(symptoms):
         return training_data[symptom_lower]
     else:
         # Use the API if the symptom is not in the training data
-        messages = [SystemMessage("You are a virtual doctor that you predict the diesease name and give the medical assesments and remedies ."), HumanMessage(f"I have {symptoms}. What should I do?")]
+        messages = [SystemMessage("You are a virtual doctor that you predict the diesease name and give the medication , medical assesments and remedies ."), HumanMessage(f"I have {symptoms}. What should I do?")]
         response = get_chat_completion(messages)
         return response
 
