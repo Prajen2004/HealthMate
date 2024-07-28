@@ -24,8 +24,8 @@ st.set_page_config(
 )
 
 img1_path = r"black-background.gif"
-img2_path = r"black-background.gif"
-background_generator = BackgroundCSSGenerator(img1_path, img2_path)
+#img2_path = r"black-background.gif"
+background_generator = BackgroundCSSGenerator(img1_path)
 page_bg_img = background_generator.generate_background_css()
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
