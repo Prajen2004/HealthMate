@@ -6,7 +6,7 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
 import threading
 import time
-from background import BackgroundCSSGenerator
+from back import BackgroundCSSGenerator
 from geopy.geocoders import Nominatim
 from streamlit_folium import st_folium
 import folium
