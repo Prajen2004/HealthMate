@@ -33,7 +33,7 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
 # Set the environment variable for the API key
-os.environ['GROQ_API_KEY'] = "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"
+os.environ['GROQ_API_KEY'] = "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"
 
 # Predefined responses for common symptoms
 training_data = {
@@ -349,7 +349,7 @@ def get_chat_completion(messages):
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         return "API key is not set. Please check the environment variable."
-    client = ChatGroq(api_key=api_key, model='llama3-70b-8192')
+    client = ChatGroq(api_key=api_key, model='llama-3.3-70b-versatile')
     try:
         response = client.invoke(messages)
         return response.content
