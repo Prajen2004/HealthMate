@@ -573,10 +573,11 @@ def main():
         password = st.text_input("Password:", type="password")
         
         if st.button("Login"):
-            if username == "admin" and password == "1234":
+            if st.button("Login"):
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.success("Logged in successfully!")
+
             else:
                 st.session_state.authenticated = False
                 st.error("Invalid credentials!")
