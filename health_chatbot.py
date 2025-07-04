@@ -33,7 +33,7 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
 # Set the environment variable for the API key
-os.environ['GROQ_API_KEY'] = "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"
+os.environ['GROQ_API_KEY'] = "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"
 
 # Predefined responses for common symptoms
 training_data = {
